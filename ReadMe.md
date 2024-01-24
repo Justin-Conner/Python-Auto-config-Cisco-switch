@@ -40,16 +40,19 @@ INDEX:
 4) Use Netmiko to establish an SSH connection, send commands, and receive output.
 5) Shell Script Integration.
     I)  Use shell scripts to automate certain tasks on your computer before or after interacting with the Cisco switch.
-7) Configuration Templates.
+6) Configuration Templates.
     I) Create configuration templates for the Cisco switch settings you want to apply. Use placeholders for dynamic values.
-9) Parameterization.
+7) Parameterization.
     I) Modify Python script to read from configuration templates and replace placeholders with actual values.
-11) Testing and Debugging.
+8) Testing and Debugging.
     I) Ensure you have a factory reset baseline before starting.
     II) Run the Python scripts and then confirm the results in the Cisco switch.
-13) Security Considerations.
+9) Security Considerations.
     I) Ensure secure handling of credentials in your script, i.e. make a config file for credential configuration & file management.
    II) Implement necessary security measures to protect against unauthorized access.
+10) Troubleshooting
+        I) Enable secret
+       II) 
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
 Setup: You can connect to the Cisco switch using the following method.
@@ -81,7 +84,7 @@ Once the connection is established, you should see the console output from the C
 Log in using the switch's credentials.
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
-Enable SSH on the Cisco Switch.
+Enable SSH on the Cisco Switch using the following commands.
 
 switch> enable
 switch# configure terminal
@@ -123,6 +126,57 @@ Security Considerations
 
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
+Troubleshooting-Enable Secret
+
+After factory restting your switch you may need get a warning message "Enable secret warning". Follow these steps to configure the secret.
+1) Enter Privileged EXEC Mode:
+
+Enter Privileged EXEC mode by typing:
+
+Switch> enable
+
+2) Enter Global Configuration Mode:
+
+Enter Global Configuration Mode by typing:
+
+Switch# configure terminal
+
+3) Set the Enable Secret Password:
+
+Set the enable secret password using the following command:
+
+Switch(config)# enable secret <enter your password>
+Replace <enter your password> with your desired enable secret password.
+
+Alternatively, you can use a more secure method by using the following command to set the enable secret in encrypted form:
+
+Switch(config)# enable secret <encrypted_password>
+Replace <encrypted_password> with the encrypted form of your desired password. You can generate the encrypted form using tools or online resources.
+
+4) Exit Configuration Mode:
+
+Exit Configuration Mode by typing:
+
+Switch(config)# end or Ctrl+Z 
+5) Save the Configuration:
+
+Save the configuration to the startup configuration file to make the changes permanent:
+
+Switch# write memory
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Toubleshooting-Please define a domain-name first
+ When you arrive at the 2) Enable SSH on the Cisco Switch. step and get an error message "please define domain name" you can follow these steps to do so
+ and allow you to complete SSH enable.
+ 1) type:
+    Switch>enable
+ 3) enter password you created during "enable secret process".
+ 4) type:
+    Switch# configure terminal
+5) type:
+    Switch(config)# ip domain-name <a name for your device>
+6) To exit configure terminal type:
+    Switch(config)# end
+    
 
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
