@@ -35,11 +35,11 @@ def create_vlan(switch_ip, username, password, vlan_id, vlan_name):
         ssh_client.close()
 
 # Replace these values with your switch's information
-switch_ip = '192.168.1.184'  # Use lowercase variable names
-username = 'CiscoJustin'  # Use lowercase variable names
-password = 'Drowssap$420'  # Use lowercase variable names
-vlan_id = '10'
-vlan_name = 'MYVLANJUSTIN'
+switch_ip = ''  # Use lowercase variable names
+username = ''  # Use lowercase variable names
+password = ''  # Use lowercase variable names
+vlan_id = ''
+vlan_name = ''
 
 # Call the function to create VLAN
 create_vlan(switch_ip, username, password, vlan_id, vlan_name)
