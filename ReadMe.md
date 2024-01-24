@@ -2,6 +2,22 @@ Python version: 3.12.1
     -Python Libraries
     Netmiko is a multi-vendor library that simplifies the process of connecting to network devices and executing commands. 
     It supports a variety of devices, including Cisco, Juniper, and others.
+    Paramiko is a dependancy of Netmiko and automatically installed with netmiko.
+    Name: netmiko
+Version: 4.3.0
+Summary: Multi-vendor library to simplify legacy CLI connections to network devices
+Home-page: https://github.com/ktbyers/netmiko
+Author: Kirk Byers
+Author-email: ktbyers@twb-tech.com
+License: MIT
+    Name: paramiko
+Version: 3.4.0
+Summary: SSH2 protocol library
+Home-page: https://paramiko.org
+Author: Jeff Forcier
+Author-email: jeff@bitprophet.org
+License: LGPL
+
 *********************************************************************************************************************************************    
 Cisco Catalyst 2960 plus series 48 Port
 
@@ -25,6 +41,8 @@ Hardware Board Revision Number  : 0x0C
 Switch Ports Model              SW Version            SW Image
 ------ ----- -----              ----------            ----------
 *    1 50    WS-C2960+48TC-L    15.0(2)SE5            C2960-LANBASEK9-M
+*    You will need the IP address of your cisco device, keep in mind that if you are using DHCP you will need to update your configuration
+*    to static for SSH connections or lookup the Ip if your IP address changes.
 
 *********************************************************************************************************************************************
 This is a project that intends to configure a Cisco Catalyst 2960 plus switch using a combination of Python,  shell scripts and  IOS commands.
@@ -55,8 +73,9 @@ INDEX:
        II) 
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
+Section 1 
 Setup: You can connect to the Cisco switch using the following method.
-
+*********************************************************************************************************************************************
 
 Use a console cable (usually provided with the Cisco device) to connect the console port on the Cisco switch to the serial port on your PC.
 Install PuTTY: https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html](https://apps.microsoft.com/detail/XPFNZKSKLBP7RJ?hl=en-us&gl=US)
@@ -84,11 +103,23 @@ Once the connection is established, you should see the console output from the C
 Log in using the switch's credentials.
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
+Section 2 
 Enable SSH on the Cisco Switch using the following commands.
-
+*********************************************************************************************************************************************
 switch> enable
 switch# configure terminal
 switch(config)# crypto key generate rsa
+----------------------------------------------------------------------
+!!!!!!RSA key size needs to be atleast 768 bits for ssh version 2!!!!!
+----------------------------------------------------------------------
+The name for the keys will be: Switch.YourDomainNameYouMadeIsHere
+Choose the size of the key modulus in the range of 360 to 4096 for your
+  General Purpose Keys. Choosing a key modulus greater than 512 may take
+  a few minutes.
+
+How many bits in the modulus [512]: 768
+----------------------------------------------------------------------
+
 switch(config)# ip ssh version 2
 switch(config)# username <your_username> privilege 15 secret <your_password>
 switch(config)# line vty 0 15
@@ -97,36 +128,50 @@ switch(config-line)# login local
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
 Python Scripting.
-I) Install dependancies.
+1) Install dependancies.
 Netmiko Documentation: https://pypi.org/project/netmiko/
+2) create a script
+   I) 
+
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
+Section 3 
 Shell Script Integration.
-
+*********************************************************************************************************************************************
 
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
+Section 4 
 Configuration Templates
-
+*********************************************************************************************************************************************
 
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
+Section 5
 Parameterization
-
+*********************************************************************************************************************************************
 
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
+Section 6 
 Testing and Debugging
-
+*********************************************************************************************************************************************
 
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
+Section 7
 Security Considerations
-
+*********************************************************************************************************************************************
 
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
-Troubleshooting-Enable Secret
+Section 8
+Troubleshooting
+*********************************************************************************************************************************************
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+Toubleshooting-Enable secret
+------------------------------------------------------------------------------------------------------------------------------------------------------
 
 After factory restting your switch you may need get a warning message "Enable secret warning". Follow these steps to configure the secret.
 1) Enter Privileged EXEC Mode:
@@ -163,8 +208,9 @@ Switch(config)# end or Ctrl+Z
 Save the configuration to the startup configuration file to make the changes permanent:
 
 Switch# write memory
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+------------------------------------------------------------------------------------------------------------------------------------------------------
 Toubleshooting-Please define a domain-name first
+------------------------------------------------------------------------------------------------------------------------------------------------------
  When you arrive at the 2) Enable SSH on the Cisco Switch. step and get an error message "please define domain name" you can follow these steps to do so
  and allow you to complete SSH enable.
  1) type:
@@ -176,6 +222,8 @@ Toubleshooting-Please define a domain-name first
     Switch(config)# ip domain-name <a name for your device>
 6) To exit configure terminal type:
     Switch(config)# end
+7) Switch# write memory
+8) continue from Enable SSH on the Cisco Switch
     
 
 *********************************************************************************************************************************************
