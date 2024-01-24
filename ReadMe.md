@@ -41,8 +41,19 @@ Hardware Board Revision Number  : 0x0C
 Switch Ports Model              SW Version            SW Image
 ------ ----- -----              ----------            ----------
 *    1 50    WS-C2960+48TC-L    15.0(2)SE5            C2960-LANBASEK9-M
+------------------------------------------------------------------------------------------------------------------------------------------
+Cisco IOS Software, C2960 Software (C2960-LANBASEK9-M), Version 15.0(2)SE5, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2013 by Cisco Systems, Inc.
+Compiled Fri 25-Oct-13 13:34 by prod_rel_team
+
+ROM: Bootstrap program is C2960 boot loader
+BOOTLDR: C2960 Boot Loader (C2960-HBOOT-M) Version 15.0(2r)EZ, RELEASE SOFTWARE (fc2)
+------------------------------------------------------------------------------------------------------------------------------------------
+*Keeping your console cable connected, connect your switch to your router to obtain an IP adress.
 *    You will need the IP address of your cisco device, keep in mind that if you are using DHCP you will need to update your configuration
-*    to static for SSH connections or lookup the Ip if your IP address changes.
+*    to static for SSH connections or lookup the Ip if your IP address changes. From (privileged EXEC) you run the command "show ip interface brief"
+*    and do not see an IP address listed you will need to configure the device IP first.
 
 *********************************************************************************************************************************************
 This is a project that intends to configure a Cisco Catalyst 2960 plus switch using a combination of Python,  shell scripts and  IOS commands.
@@ -101,6 +112,12 @@ Log in to the Cisco switch:
 
 Once the connection is established, you should see the console output from the Cisco switch.
 Log in using the switch's credentials.
+----------------------------------------------------------------------
+Obtain the IP address of the switch
+1) open PuTTY
+2) type:
+   
+----------------------------------------------------------------------
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
 Section 2 
@@ -125,13 +142,50 @@ switch(config)# username <your_username> privilege 15 secret <your_password>
 switch(config)# line vty 0 15
 switch(config-line)# transport input ssh
 switch(config-line)# login local
+
+*    You will need the IP address of your cisco device, keep in mind that if you are using DHCP you will need to update your configuration
+*    to static for SSH connections or lookup the Ip if your IP address changes. From (privileged EXEC) you run the command "show ip interface brief"
+*    and do not see an IP address listed you will need to configure the device IP first.
+*    !!!!!SEE SECTION!!!!! "Toubleshooting-configure your Cisco switch to obtain an IP address dynamically using DHCP"
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
 Python Scripting.
 1) Install dependancies.
 Netmiko Documentation: https://pypi.org/project/netmiko/
 2) create a script
-   I) 
+   I) import paramiko
+
+def create_vlan(switch_ip, username, password, vlan_id, vlan_name):
+    # Connect to the switch
+    ssh_client = paramiko.SSHClient()
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh_client.connect(switch_ip, username=username, password=password)
+
+    # Send commands to create VLAN
+    commands = [
+        'configure terminal',
+        f'vlan {vlan_id}',
+        f'name {vlan_name}',
+        'exit'
+    ]
+
+    for command in commands:
+        stdin, stdout, stderr = ssh_client.exec_command(command)
+        print(stdout.read().decode())
+
+    # Close the SSH connection
+    ssh_client.close()
+
+# Replace these values with your switch's information
+switch_ip = '<switch_ip>'
+username = '<your_username>'
+password = '<your_password>'
+vlan_id = '10'  # Replace with your desired VLAN ID
+vlan_name = 'MYVLAN'  # Replace with your desired VLAN name
+
+# Call the function to create VLAN
+create_vlan(switch_ip, username, password, vlan_id, vlan_name)
+
 
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
@@ -224,7 +278,34 @@ Toubleshooting-Please define a domain-name first
     Switch(config)# end
 7) Switch# write memory
 8) continue from Enable SSH on the Cisco Switch
-    
+------------------------------------------------------------------------------------------------------------------------------------------------------
+Toubleshooting-configure your Cisco switch to obtain an IP address dynamically using DHCP
+------------------------------------------------------------------------------------------------------------------------------------------------------   
+configure your Cisco switch to obtain an IP address dynamically using DHCP:
+1) Enter Global Configuration Mode:
 
+Switch# configure terminal
+2) Enter Interface Configuration Mode for VLAN 1 (or your management VLAN):
+
+Switch(config)# interface vlan 1
+3) Configure the Interface to Obtain an IP Address via DHCP:
+
+Switch(config-if)# ip address dhcp
+4) Enable the Interface:
+
+Switch(config-if)# no shutdown
+5) Exit Configuration Mode:
+
+Switch(config-if)# exit
+6) Save the Configuration:
+
+Switch# write memory
+These commands configure the VLAN 1 interface (or your management VLAN) to obtain an IP address dynamically using DHCP. The ip address dhcp command instructs the switch to request an IP address from a DHCP server.
+After configuring the switch, it will send a DHCP request to the DHCP server on the network. Make sure that you have a DHCP server in your network that can provide IP addresses to devices.
+You can verify the configuration and check if the switch has obtained an IP address by using the following command:
+
+7) Show Cisco device IP address
+  Switch# show ip interface brief
+Look for the VLAN 1 interface in the output, and ensure that it has an IP address assigned by DHCP.
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
